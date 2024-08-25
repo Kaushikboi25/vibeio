@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-firestore.js"></script>
+</head>
+<body>
+    <!-- Jumbotron -->
+    <section class="">
+        <div class="px-4 py-5 px-md-5 text-center text-lg-start" style="background-color: hsl(0, 0%, 96%)">
+            <div class="container">
+                <div class="row gx-lg-5 align-items-center">
+                    <div class="col-lg-6 mb-5 mb-lg-0">
+                        <h1 class="my-5 display-3 fw-bold ls-tight">
+                            Vibio <br />
+                            <span class="text-primary">Vibe with THEM!</span>
+                        </h1>
+                        <p style="color: hsl(217, 10%, 50.8%)">
+                           Sign Up Today to join community of same people like you and vibe with them,
+                           find new friends and chat with them, Use new stickers and find the best ones
+                           to vibe with.
+                        </p>
+                    </div>
+
+                    <div class="col-lg-6 mb-5 mb-lg-0">
+                        <div class="card">
+                            <div class="card-body py-5 px-md-5">
+                                <!-- Signup Form -->
+                                <div class="container">
+                                    <h1 class="my-5">Sign Up</h1>
+                                    <div class="mb-3">
+                                        <label for="username" class="form-label">Username</label>
+                                        <input type="text" class="form-control" id="username" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">Email address</label>
+                                        <input type="email" class="form-control" id="email" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="password" class="form-label">Password</label>
+                                        <input type="password" class="form-control" id="password" required>
+                                    </div>
+                                    <button id="signup-button" class="btn btn-primary">Sign Up</button>
+                                    <div id="success-message" class="d-none mt-3 alert alert-success">
+                                        Sign-up successful! Redirecting...
+                                    </div>
+                                    <div id="error-message" class="d-none mt-3 alert alert-danger">
+                                        Sign-up failed! Please try again.
+                                    </div>
+                                    <p class="mt-3">or sign up with:</p>
+                                    <div class="text-center">
+                                        <button type="button" class="btn btn-link btn-floating mx-1">
+                                            <i class="fab fa-facebook-f"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-link btn-floating mx-1">
+                                            <i class="fab fa-google"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-link btn-floating mx-1">
+                                            <i class="fab fa-twitter"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-link btn-floating mx-1">
+                                            <i class="fab fa-github"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- End Signup Form -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End Jumbotron -->
+
+    <!-- JavaScript -->
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyDxS7qXtrtXJkES2kouqFEHmE13yak8zy8",
+            authDomain: "vibio-1a11b.firebaseapp.com",
+            projectId: "vibio-1a11b",
+            storageBucket: "vibio-1a11b.appspot.com",
+            messagingSenderId: "932933731183",
+            appId: "1:932933731183:web:68b8497eb6442457ba1e9a"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        var auth = firebase.auth();
+        var db = firebase.firestore();
+
+        document.getElementById('signup-button').addEventListener('click', function () {
+            var username = document.getElementById('username').value;
+            var email = document.getElementById('email').value;
+            var password = document.getElementById('password').value;
+
+            auth.createUserWithEmailAndPassword(email, password)
+                .then(function (userCredential) {
+                    // User created
+                    var user = userCredential.user;
+                    console.log('User created:', user);
+
+                    // Save user details in Firestore
+                    db.collection('users').doc(user.uid).set({
+                        username: username,
+                        email: email
+                    })
+                    .then(function () {
+                        console.log('User details saved in Firestore');
+                    })
+                    .catch(function (error) {
+                        console.error('Error saving user details:', error);
+                    });
+
+                    // Save user details in local storage
+                    localStorage.setItem('user', JSON.stringify({
+                        uid: user.uid,
+                        username: username,
+                        email: email
+                    }));
+
+                    // Show success message and redirect
+                    document.getElementById('success-message').classList.remove('d-none');
+                    setTimeout(function () {
+                        window.location.href = 'home.html'; // Redirect to another page
+                     
+                    }, 2000);
+                })
+                .catch(function (error) {
+                    // Handle Errors here.
+                    var errorCode = error.code;
+                    var errorMessage = error.message;
+                    console.error('Error:', errorCode, errorMessage);
+                    document.getElementById('error-message').classList.remove('d-none');
+                });
+        });
+    </script>
+</body>
+</html>
